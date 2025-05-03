@@ -1,0 +1,20 @@
+version: "3.9"
+
+services:
+  app:
+    build:
+      context: ./bot
+      dockerfile: Dockerfile
+    container_name: rhgtgbot
+    environment:
+      BOT_TOKEN: 
+      API_ID: 
+      API_HASH: 
+#      HTTP_PROXT: http://
+#      HTTPS_PROXY: http://
+    network_mode: "host"
+#    netowrk_mode: "container:name"
+    volumes:
+      - ./bot_assets:/bot/assets
+      - ./bot_log s:/bot/logs
+    restart: never

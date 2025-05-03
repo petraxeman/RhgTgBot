@@ -1,0 +1,7 @@
+*.session
+__pycache__/
+
+bot_assets/
+bot_logs/
+
+docker-compose-test.yaml

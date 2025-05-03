@@ -1,0 +1,6 @@
+toml==0.10.2
+ZODB==6.0
+pyrogram==2.0.106
+google-genai==1.2.0
+tgcrypto-pyrofork==1.2.7
+uvloop==0.21.0

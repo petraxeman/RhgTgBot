@@ -1,0 +1,10 @@
+[SETUP]
+owner_username = ""
+reload_config = true
+migrate_from = false
+
+[SETTINGS]
+hr_bot_name = ""
+default_rights = ""
+register_mode = ""
+allow_python_scripts = false
