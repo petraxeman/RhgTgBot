@@ -1,4 +1,6 @@
-import os, toml, ZODB, logging
+import ZEO.asyncio
+import ZEO.asyncio.client
+import os, toml, ZODB, logging, ZEO
 
 log = logging.getLogger("rhgTGBot:globals")
 
@@ -15,7 +17,9 @@ with open(os.path.join(".", "assets", "config.toml"), "r", encoding="utf8") as f
 
 
 log.info("Загрузка базы данных")
-db = ZODB.DB(os.path.join(".", "assets", "db", "db.db"))
+client = ZEO.client(("127.0.0.1", 3000))
+db = ZODB.DB(client)
+#db = ZODB.DB(os.path.join(".", "assets", "db", "db.db"))
 
 
 def init_const():

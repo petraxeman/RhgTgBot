@@ -59,7 +59,7 @@ async def gemini_ask(client: Client, message: Message):
     userid = message.from_user.id
     task = asyncio.create_task(utils.send_typing(message))
     try:
-        with g.db.transaction() as conn:
+        async with g.db.transaction() as conn:
             try:
                 user_rights = list(conn.root.users[userid].rights)
                 profile_name = conn.root.users[userid].active_profile
