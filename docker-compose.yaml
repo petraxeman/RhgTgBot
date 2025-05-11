@@ -16,5 +16,5 @@ services:
 #    netowrk_mode: "container:name"
     volumes:
       - ./bot_assets:/bot/assets
-      - ./bot_log s:/bot/logs
+      - ./bot_logs:/bot/logs
     restart: never
