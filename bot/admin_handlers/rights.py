@@ -21,7 +21,9 @@ async def add_right(client: Client, message: Message):
     user_info = await client.get_users(username)
     
     with g.db.transaction() as conn:
-        conn.root.users[user_info.id].rights.append(right)
+        rights = list(conn.root.users[user_info.id].rights)
+        rights.append(right)
+        conn.root.users[user_info.id].rights = rights
     
     await message.reply_text(f"Для пользователяя {username} установлено право {right}")
     if message.from_user.id != user_info.id:
@@ -40,7 +42,9 @@ async def sub_right(client: Client, message: Message):
     user_info = await client.get_users(username)
 
     with g.db.transaction() as conn:
-        conn.root.users[user_info.id].rights.remove(right)
+        rights = list(conn.root.users[user_info.id].rights)
+        rights.remove(right)
+        conn.root.users[user_info.id].rights = rights
     
     await message.reply_text(f"У пользователя {username} удалено право {right}")
     if message.from_user.id != user_info.id:
