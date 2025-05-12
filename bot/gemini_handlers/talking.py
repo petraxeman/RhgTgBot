@@ -26,7 +26,7 @@ async def ask(client: Client, message: Message):
     if params.get("forgot", False):
         with g.db.transaction() as conn:
             profile_name = conn.root.users[user_id].active_profile
-            profile = conn.root.users[user_id].profiles.get(profile_name)
+            profile = conn.root.users[user_id].profiles[profile_name].chat = []
             profile.chat = []
     
     if vector:
@@ -48,13 +48,12 @@ async def private_ask(client: Client, message: Message):
         chat = list(profile.chat)
         user_params = dict(profile.config)
     
-    params = utils.bot.parse_flags(flags, user_params or {})
+    params = utils.message.parse_flags(flags, user_params or {})
 
     if params.get("forgot", False):
         with g.db.transaction() as conn:
             profile_name = conn.root.users[user_id].active_profile
-            profile = conn.root.users[user_id].profiles.get(profile_name)
-            profile.chat = []
+            profile = conn.root.users[user_id].profiles[profile_name].chat = []
 
     await utils.ai.ask(message, clear_msg, chat, params)
     

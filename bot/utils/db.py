@@ -5,13 +5,14 @@ import logging
 import globals as g
 
 import ZODB
-from BTrees.IOBTree import IOBTree, OOBTree
+from BTrees.IOBTree import IOBTree
+from BTrees.OOBTree import OOBTree
 
 log = logging.getLogger("rhgTGBot:dbsetup")
 
-
 system_instruction = ""
 actual_version = 1
+
 
 
 def initiate_database(db):

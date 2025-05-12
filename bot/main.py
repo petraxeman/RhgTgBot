@@ -88,9 +88,7 @@ async def gemini_ask(client: Client, message: Message):
     finally:
         task.cancel()
         await bot.send_chat_action(message.chat.id, ChatAction.CANCEL)
-    
-    
-
+   
 
 async def transfer(client: Client, message: Message):
     if message.from_user.username == g.owner_username:
@@ -111,7 +109,6 @@ async def transfer(client: Client, message: Message):
             await message.reply_text("Кажется мой владелец еще не существует.")
         
         log.info(f"Трансфер успешно проведен. Бывший админ {message.from_user.username}. Новый админ {new_owner_username}")
-
 
 
 async def main():
@@ -163,9 +160,6 @@ if __name__ == "__main__":
     
     utils.db.initiate_database(g.db)
     g.init_const()
-    
-    if g.cfg.get("SETUP", {}).get("migrate_from", False):
-        utils.db.migrate_from()
     
     bot = utils.bot.setup_bot()
     
