@@ -1,5 +1,3 @@
-import ZEO.asyncio
-import ZEO.asyncio.client
 import os, toml, ZODB, logging, ZEO
 
 log = logging.getLogger("rhgTGBot:globals")

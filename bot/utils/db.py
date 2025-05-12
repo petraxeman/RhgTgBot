@@ -33,47 +33,6 @@ def initiate_database(db):
                 set_if_not_exists(conn.root.config, g.cfg.get("SETTINGS", {}), prop)
 
 
-def validate():
-    log.info("Начало миграции.")
-    
-    old_db = ZODB.DB("/bot/migration_from/db.db")
-    tgids = []
-    with old_db.transaction() as conn:
-        tgids = list(conn.root.users.keys())
-    
-    for tgid in tgids:
-        user = {}
-        with old_db.transaction() as conn:
-            u = conn.root.users[tgid]
-            # For very old version
-            if isinstance(u, persistent.mapping.PersistentMapping):
-                user["username"] = u.get("tg_username")
-                user["tgid"] = u.get("tg_id")
-                user["rights"] = list(u.get("rights", g.default_rights))
-                user["profile_config"] = dict(u.get("gemini_config", {}))
-                user["profile_config"]["token"] = u.get("gemini_token", None)
-                user["chat"] = list(u.get("chat"))
-    
-        with g.db.transaction() as conn:
-            if user:
-                u = User(user["username"], user["tgid"])
-                u.rights = user["rights"]
-                u.profiles["default"].chat = user["chat"]
-                u.profiles["default"].config = user["profile_config"]
-                conn.root.users[tgid] = u
-    
-    with old_db.transaction() as conn:
-        for tgid in conn.root.users:
-            user = conn.root.users[tgid]
-            log.info(f"{tgid} {user.get('tg_username')}")
-    
-    with g.db.transaction() as conn:
-        for tgid in conn.root.users:
-            user = conn.root.users[tgid]
-            log.info(f"{tgid} {user.username}")
-    log.info("Миграция завершена.")
-
-
 class User(persistent.Persistent):
     def __init__(self, username, tgid):
         self.version = 1

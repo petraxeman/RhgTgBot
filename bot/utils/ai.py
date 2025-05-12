@@ -31,8 +31,7 @@ async def ask(message: Message, request: str, chat: list, params: dict):
         
         with g.db.transaction() as conn:
             profile_name = conn.root.users[user_id].active_profile
-            profile = conn.root.users[user_id].profiles.get(profile_name)
-            profile.chat = chat
+            conn.root.users[user_id].profiles[profile_name].chat = chat
     
     if params.get("delete"):
         await message.delete()

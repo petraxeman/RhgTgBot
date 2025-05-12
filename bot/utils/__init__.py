@@ -3,8 +3,8 @@ from pyrogram import Client
 from pyrogram.types import Message
 from pyrogram.enums import ChatAction
 
-true = ["t", "true", "yes", "y", "1", "д", "да"]
-false = ["f", "false", "no", "n", "0", "н", "нет"]
+true = ["t", "true", "yes", "y", "1", "д", "да", "-"]
+false = ["f", "false", "no", "n", "0", "н", "нет", "+"]
 
 
 
