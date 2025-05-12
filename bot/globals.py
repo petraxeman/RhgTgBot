@@ -19,7 +19,6 @@ with open(os.path.join(".", "assets", "config.toml"), "r", encoding="utf8") as f
 log.info("Загрузка базы данных")
 client = ZEO.client(("127.0.0.1", 3000))
 db = ZODB.DB(client)
-#db = ZODB.DB(os.path.join(".", "assets", "db", "db.db"))
 
 
 def init_const():

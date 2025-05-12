@@ -4,6 +4,7 @@ from pyrogram.types import Message
 import utils
 
 import globals as g
+import utils.message
 
 log = logging.getLogger("rhgTGBot:gemini:talking")
 
@@ -12,7 +13,7 @@ log = logging.getLogger("rhgTGBot:gemini:talking")
 async def ask(client: Client, message: Message):
     user_id = message.from_user.id
     
-    flags, vector, clear_msg = utils.bot.parse_ask_msg(message.text)
+    flags, vector, clear_msg = utils.message.parse_ask_msg(message.text)
     
     with g.db.transaction() as conn:
         profile_names = conn.root.users[user_id].active_profile
@@ -20,7 +21,7 @@ async def ask(client: Client, message: Message):
         chat = list(profile.chat)
         user_params = dict(profile.config)
     
-    params = utils.bot.parse_flags(flags, user_params or {})
+    params = utils.message.parse_flags(flags, user_params or {})
 
     if params.get("forgot", False):
         with g.db.transaction() as conn:
@@ -38,8 +39,8 @@ async def ask(client: Client, message: Message):
 
 async def private_ask(client: Client, message: Message):
     user_id = message.from_user.id
-    message.text = message.text.replace("@bot", g.hr_bot_name)
-    flags, _, clear_msg = utils.bot.parse_ask_msg(message.text)
+    message.text = message.text.replace("@bot", g.tg_bot_name)
+    flags, _, clear_msg = utils.message.parse_ask_msg(message.text)
     
     with g.db.transaction() as conn:
         profile_names = conn.root.users[user_id].active_profile
