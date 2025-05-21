@@ -8,9 +8,7 @@ import globals as g
 log = logging.getLogger("rhgTGBot:administration:app")
 
 APP_SETTINGS = {
-    "register_mode": ("auto", "manual"),
     "default_rights": "string",
-    "allow_python_scripts": (True, False),
     "hr_bot_name": "string"
 }
 

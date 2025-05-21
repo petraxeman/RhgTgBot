@@ -19,7 +19,14 @@ users = []
 with db.transaction() as conn:
     for tgid in conn.root.users.keys():
         user = conn.root.users[tgid]
+        
+        try:
+            username = user.username
+        except:
+            username = user.tgid
+        
         users.append( {
+            "username": username,
             "tgid": tgid,
             "rights": list(user.rights),
             "active_profile": user.active_profile,
@@ -27,7 +34,6 @@ with db.transaction() as conn:
             }
         )
 
-for user in users:
-    print(user["tgid"])
-    print(user)
-    print("\n\n\n")
+with db.transaction() as conn:
+    for user in users:
+        conn.root.users[user["tgid"]] = user

@@ -25,17 +25,6 @@ def setup_bot():
     return bot
 
 
-async def initiate_admin(client):
-    user_info = await client.get_users(g.owner_username)
-    log.info("Настройка админа.")
-    with g.db.transaction() as conn:
-        if not user_info.id in conn.root.users or g.cfg.get("SETUP", {}).get("reload_config", False):
-            user = db.User(user_info.username, user_info.id)
-            user.rights.append("all:full")
-            conn.root.users[user_info.id] = user
-    log.info("Админ настроен.")
-
-
 async def initiate_bot(client):
     log.info("Получение информации о боте.")
 

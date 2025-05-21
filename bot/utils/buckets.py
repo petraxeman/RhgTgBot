@@ -4,7 +4,7 @@ import globals as g
 
 def create_bucket(project: str, config: dict):
     bucket = config.copy()
-    bucket_name = bucket["name"]
+    
     del bucket["name"]
     if bucket["type"] == "list":
         bucket["storage"] = []

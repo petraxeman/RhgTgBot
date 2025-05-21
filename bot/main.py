@@ -43,35 +43,24 @@ async def pre_private_command(client: Client, message: Message):
         except KeyError:
             user = None
         
-        if not user and g.register_mode == "auto":
-            user = utils.db.User(message.from_user.username, message.from_user.id)
-            conn.root.users[message.from_user.id] = user
-        
-        result = await utils.access.process(message.matches[0].group("command"), user.rights if user else [], message, log)
+        result = await utils.access.process(message.matches[0].group("command"), user["rights"] if user else [], message, log)
 
-        message.sender_rights = list(user.rights)
+        message.sender_rights = list(user["rights"])
     
     if not result:
         message.stop_propagation()
 
 
 async def gemini_ask(client: Client, message: Message):
-    if not message.text or message.text[0]:
+    if not message.text or message.text[0] in ["/", "!"]:
         return
     userid = message.from_user.id
     task = asyncio.create_task(utils.send_typing(message))
     try:
         with g.db.transaction() as conn:
-            try:
-                user_rights = list(conn.root.users[userid].rights)
-                profile_name = conn.root.users[userid].active_profile
-                profile = conn.root.users[userid].profiles.get(profile_name)
-                if profile:
-                    token = profile.config.get("token")
-                else:
-                    token = None
-            except KeyError:
-                return
+            user_rights = list(conn.root.users[userid]["rights"])
+            profile_name = conn.root.users[userid]["active_profile"]
+            token = conn.root.users[userid]["profiles"].get(profile_name, {}).get("config", {}).get("token", "")
         
         if not token or len(token) < 20:
             return
@@ -80,13 +69,13 @@ async def gemini_ask(client: Client, message: Message):
             result = await utils.access.process("ask", user_rights, message, log)
             if not result:
                 return
-            await gemini_handlers.private_ask(client, message)
+            await handlers.gemini.talking.private_ask(client, message)
             
         elif message.chat.type in [ChatType.GROUP, ChatType.SUPERGROUP]:
             result = await utils.access.process("private_ask", user_rights, message, log)
             if not result:
                 return
-            await gemini_handlers.ask(client, message)
+            await handlers.gemini.talking.ask(client, message)
     finally:
         task.cancel()
         await bot.send_chat_action(message.chat.id, ChatAction.CANCEL)
@@ -128,7 +117,7 @@ async def main():
     
     log.info("Обработчики созданы.")
     
-    await utils.bot.initiate_admin(bot)
+    await utils.db.initiate_admin(bot)
     await utils.bot.initiate_bot(bot)
     
     try:
@@ -143,6 +132,7 @@ async def main():
 if __name__ == "__main__":
     log.info("Инициализация базы данных")
     
+    utils.db.initiate_derictories()
     utils.db.initiate_database(g.db)
     g.init_const()
     

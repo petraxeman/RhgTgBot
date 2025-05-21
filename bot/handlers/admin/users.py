@@ -24,8 +24,7 @@ async def add_user(client: Client, message: Message):
         return
     
     with g.db.transaction() as conn:
-        user = utils.db.User(user_info.username, user_info.id)
-        user.rights = persistent.list.PersistentList(g.default_rights if g.default_rights else [])
+        user = utils.db.create_user(user_info.id)
         conn.root.users[user_info.id] = user
     
     await message.reply_text(f"Пользователь {username} успешно добавлен")
@@ -61,7 +60,7 @@ async def users_list(client: Client, message: Message):
     with g.db.transaction() as conn:
         for index, tgid in enumerate(conn.root.users.keys()):
             if page * 10 <= index and index < (page * 10) + 10:
-                users_list_strings.append(f"{index+1}. {conn.root.users[tgid].username}")
+                users_list_strings.append(f"{index+1}. {conn.root.users[tgid]["username"]}")
 
     if not users_list_strings:
         await message.reply_text(f"Извините, но на странице {page+1} нет пользователей")

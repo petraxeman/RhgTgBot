@@ -12,6 +12,7 @@ register_mode = None
 log.info("Загрузка конфигурации")
 with open(os.path.join(".", "assets", "config.toml"), "r", encoding="utf8") as file:
     cfg = toml.loads(file.read())
+cfg["SETTINGS"]["default_rights"] = cfg.get("SETTINGS", {}).get("default_rights", "").replace(" ", "").split(",")
 
 
 log.info("Загрузка базы данных")
