@@ -22,7 +22,7 @@ from pyrogram import Client, filters
 from pyrogram.types import Message
 from pyrogram.enums import ChatType, ChatAction
 
-import utils, admin_handlers, info_handlers, gemini_handlers
+import utils, handlers
 
 
 
@@ -30,7 +30,9 @@ PRELUDE = -1
 ADM = 0
 INFO = 1
 ACCOUNT = 2
-GEMINI = 3
+PROJECT = 3
+GEMINI = 15
+
 
 
 
@@ -54,7 +56,7 @@ async def pre_private_command(client: Client, message: Message):
 
 
 async def gemini_ask(client: Client, message: Message):
-    if message.text[0] == "/":
+    if not message.text or message.text[0]:
         return
     userid = message.from_user.id
     task = asyncio.create_task(utils.send_typing(message))
@@ -118,27 +120,10 @@ async def main():
     
     bot.add_handler(MessageHandler(transfer, filters.command("transfer") & filters.private), group = PRELUDE)
     bot.add_handler(MessageHandler(pre_private_command, filters.private & filters.regex(r"^\/(?P<command>[a-zA-Z]\S*)")), group = PRELUDE)
-    
-    bot.add_handler(MessageHandler(admin_handlers.add_user, filters.command("add_user") & filters.private), group = ADM)
-    bot.add_handler(MessageHandler(admin_handlers.del_user, filters.command("del_user") & filters.private), group = ADM)
-    bot.add_handler(MessageHandler(admin_handlers.users_list, filters.command("users_list") & filters.private), group = ADM)
-    bot.add_handler(MessageHandler(admin_handlers.add_right, filters.command("add_right") & filters.private), group = ADM)
-    bot.add_handler(MessageHandler(admin_handlers.sub_right, filters.command("sub_right") & filters.private), group = ADM)
-    bot.add_handler(MessageHandler(admin_handlers.show_rights, filters.command("show_rights") & filters.private), group = ADM)
-    bot.add_handler(MessageHandler(admin_handlers.app_args, filters.command("app_args") & filters.private), group = ADM)
-    bot.add_handler(MessageHandler(admin_handlers.set_app_arg, filters.command("set_app_arg") & filters.private), group = ADM)
-    
-    bot.add_handler(MessageHandler(info_handlers.start_command, filters.command("start") & filters.private), group = INFO)
-    bot.add_handler(MessageHandler(info_handlers.help_command, filters.command("help") & filters.private), group = INFO)
-    
-    bot.add_handler(MessageHandler(gemini_handlers.gmn_args, filters.command("gmn_args") & filters.private), group = GEMINI)
-    bot.add_handler(MessageHandler(gemini_handlers.set_gmn_arg, filters.command("set_gmn_arg") & filters.private), group = GEMINI)
-    bot.add_handler(MessageHandler(gemini_handlers.profiles, filters.command("profiles") & filters.private), group = GEMINI)
-    bot.add_handler(MessageHandler(gemini_handlers.clone_profile, filters.command("clone_profile") & filters.private), group = GEMINI)
-    bot.add_handler(MessageHandler(gemini_handlers.rename_profile, filters.command("rename_profile") & filters.private), group = GEMINI)
-    bot.add_handler(MessageHandler(gemini_handlers.select_profile, filters.command("select_profile") & filters.private), group = GEMINI)
-    bot.add_handler(MessageHandler(gemini_handlers.delete_profile, filters.command("delete_profile") & filters.private), group = GEMINI)
-    
+    handlers.admin.include(bot, ADM)
+    handlers.info.include(bot, INFO)
+    handlers.project.include(bot, PROJECT)
+    handlers.gemini.include(bot, GEMINI)
     bot.add_handler(MessageHandler(gemini_ask, filters.mentioned | filters.private), group = GEMINI)
     
     log.info("Обработчики созданы.")

@@ -50,4 +50,4 @@ async def send_typing(message: Message):
         await asyncio.sleep(5)
 
 
-from . import bot, db, access, ai, message
+from . import bot, db, access, ai, message, tempdirs

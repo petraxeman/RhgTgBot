@@ -1,6 +1,9 @@
 FROM python:3.12-slim
 
-RUN apt-get update --fix-missing && apt-get install supervisor -y && apt-get clean
+RUN apt-get update --fix-missing && \
+    apt-get install supervisor git -y \
+    && apt-get clean \
+    && git config --global http.proxyAuthMethod 'basic'
 
 WORKDIR /bot
 

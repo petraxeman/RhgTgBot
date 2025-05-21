@@ -87,3 +87,9 @@ async def grab_messages(client: Client, message: Message, direction: dict):
         curr_msg_id = msgs[-1].id + vector
     
     return "\n". join(["История чата сообщений:"] + catched_messages[::-1])
+
+
+def message_has_archive(message: Message) -> bool:
+    if message.document.file_name.endswith(".zip"):
+        return True
+    return False

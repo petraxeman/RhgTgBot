@@ -3,6 +3,7 @@ import persistent.list
 import persistent.mapping
 import logging
 import globals as g
+import os
 
 import ZODB
 from BTrees.IOBTree import IOBTree
@@ -22,7 +23,8 @@ def initiate_database(db):
     with db.transaction() as conn:
         if not hasattr(conn.root, "users"): conn.root.users = IOBTree()
         if not hasattr(conn.root, "users_list"): conn.root.users_list = persistent.list.PersistentList()
-        if not hasattr(conn.root, "groups"): conn.root.buckets = IOBTree()
+        if not hasattr(conn.root, "groups"): conn.root.groups = IOBTree()
+        if not hasattr(conn.root, "projects"): conn.root.projects = OOBTree()
         if not hasattr(conn.root, "buckets"): conn.root.buckets = OOBTree()
         if not hasattr(conn.root, "config") or g.cfg.get("SETUP", {}).get("reload_config", False):
             conn.root.config = persistent.mapping.PersistentMapping()
@@ -33,10 +35,24 @@ def initiate_database(db):
                 set_if_not_exists(conn.root.config, g.cfg.get("SETTINGS", {}), prop)
 
 
+def initiate_derictories():
+    for directory in ["assets", "logs"]:
+        if not os.path.exists(os.path.join(".", directory)):
+            os.makedirs(os.path.join(".", directory))
+    
+    for directory in ["db", "sessions", "temp", "projects"]:
+        if not os.path.exists(os.path.join(".", "assets", directory)):
+            os.makedirs(os.path.join(".", "assets", directory))
+
+
+def validate_db():
+    with g.db.transaction() as conn:
+        for user in conn.root.users.keys():
+            pass
+
+
 class User(persistent.Persistent):
     def __init__(self, username, tgid):
-        self.version = 1
-        self.username = username
         self.tgid = tgid
         self.rights = persistent.list.PersistentList()
         self.active_profile = "default"

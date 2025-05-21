@@ -6,3 +6,5 @@ tgcrypto-pyrofork==1.2.7
 uvloop==0.21.0
 ZEO==6.0.0
 apscheduler==3.11.0
+GitPython==3.1.44
+pyyaml==6.0.2
