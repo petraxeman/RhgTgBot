@@ -48,11 +48,11 @@ def initiate_derictories():
 async def initiate_admin(client):
     log.info("Настройка админа.")
     user_info = await client.get_users(g.owner_username)
-    with g.db.transaction() as conn:
-        if not str(user_info.id) in conn.root.users or g.cfg.get("SETUP", {}).get("reload_config", False):
-            user = create_user(g.owner_username, user_info.id)
-            user["rights"] = ["all:full"]
-            conn.root.users[user_info.id] = user
+    # with g.db.transaction() as conn:
+    #     if not str(user_info.id) in conn.root.users or g.cfg.get("SETUP", {}).get("reload_config", False):
+    #         user = create_user(g.owner_username, user_info.id)
+    #         user["rights"] = ["all:full"]
+    #         conn.root.users[user_info.id] = user
     log.info("Админ настроен.")
 
 
