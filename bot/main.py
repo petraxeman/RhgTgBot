@@ -37,6 +37,8 @@ GEMINI = 15
 
 
 async def pre_private_command(client: Client, message: Message):
+    message.from_user.id = str(message.from_user.id)
+    
     with g.db.transaction() as conn:
         try:
             user = conn.root.users[message.from_user.id]
@@ -54,6 +56,7 @@ async def pre_private_command(client: Client, message: Message):
 async def gemini_ask(client: Client, message: Message):
     if not message.text or message.text[0] in ["/", "!"]:
         return
+    message.from_user.id = str(message.from_user.id)
     userid = message.from_user.id
     task = asyncio.create_task(utils.send_typing(message))
     try:

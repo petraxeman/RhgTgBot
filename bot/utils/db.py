@@ -21,9 +21,8 @@ def initiate_database(db):
         config[name] = cfg.get(name, "") if not config.get(name) else config[name]
         
     with db.transaction() as conn:
-        if not hasattr(conn.root, "users"): conn.root.users = IOBTree()
-        if not hasattr(conn.root, "users_list"): conn.root.users_list = persistent.list.PersistentList()
-        if not hasattr(conn.root, "groups"): conn.root.groups = IOBTree()
+        if not hasattr(conn.root, "users"): conn.root.users = OOBTree()
+        if not hasattr(conn.root, "groups"): conn.root.groups = OOBTree()
         if not hasattr(conn.root, "projects"): conn.root.projects = OOBTree()
         if not hasattr(conn.root, "buckets"): conn.root.buckets = OOBTree()
         if not hasattr(conn.root, "config") or g.cfg.get("SETUP", {}).get("reload_config", False):
@@ -50,7 +49,7 @@ async def initiate_admin(client):
     log.info("Настройка админа.")
     user_info = await client.get_users(g.owner_username)
     with g.db.transaction() as conn:
-        if not user_info.id in conn.root.users or g.cfg.get("SETUP", {}).get("reload_config", False):
+        if not str(user_info.id) in conn.root.users or g.cfg.get("SETUP", {}).get("reload_config", False):
             user = create_user(g.owner_username, user_info.id)
             user["rights"] = ["all:full"]
             conn.root.users[user_info.id] = user
@@ -63,10 +62,10 @@ def validate_db():
             pass
 
 
-def create_user(username: str, tgid: int) -> dict:
+def create_user(username: str, tgid: str) -> dict:
     return {
         "username": username,
-        "tgid": tgid,
+        "tgid": str(tgid),
         "rights": g.cfg["SETTINGS"]["default_rights"],
         "active_profile": "default",
         "profiles": {"default": {

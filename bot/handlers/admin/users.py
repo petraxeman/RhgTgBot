@@ -24,8 +24,8 @@ async def add_user(client: Client, message: Message):
         return
     
     with g.db.transaction() as conn:
-        user = utils.db.create_user(user_info.id)
-        conn.root.users[user_info.id] = user
+        user = utils.db.create_user(user_info.username, user_info.id)
+        conn.root.users[str(user_info.id)] = user
     
     await message.reply_text(f"Пользователь {username} успешно добавлен")
     log.info(f"Пользователь {user_info.username} ({user_info.id}) успешно добавлен пользователем {message.from_user.username} ({message.from_user.id})")
@@ -44,7 +44,7 @@ async def del_user(client: Client, message: Message):
         return
     
     with g.db.transaction() as conn:
-        del conn.root.users[user_info.id]
+        del conn.root.users[str(user_info.id)]
     
     await message.reply_text(f"Пользователь {username} успешно удален")
     log.info(f"Пользователь {user_info.username} ({user_info.id}) успешно удален пользователем {message.from_user.username} ({message.from_user.id})")
