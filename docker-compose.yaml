@@ -18,3 +18,20 @@ services:
       - ./bot_assets:/bot/assets
       - ./bot_logs:/bot/logs
     restart: never
+  
+    db:
+    image: mongo
+    container_name: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME:
+      MONGO_INITDB_ROOT_PASSWORD:
+    volumes:
+      - ./db_data:/data/db
+    ports:
+      - "27017:27017"
+    deploy:
+      resources:
+        limits:
+          cpus: 0.5
+          memory: 512m
+    restart: always
