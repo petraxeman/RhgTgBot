@@ -36,14 +36,14 @@ with db.transaction() as conn:
                 "name": profile,
                 "owner": user['tgid'],
                 "config": {
-                    "token": profiles[profile].get('token', ''),
-                    "forgot": profiles[profile].get('forgot', False),
-                    "search": profiles[profile].get('search', False),
-                    "delete": profiles[profile].get('delete', False),
-                    "skipmsg": profiles[profile].get('skipmsg', False),
-                    "model": profiles[profile].get('model', "gemini-2.0-flash"),
-                    "max_chat_size": profiles[profile].get('max_chat_size', 15),
-                    "system_instruction": profiles[profile].get('system_instruction', "")
+                    "token": profiles[profile].get("config", {}).get('token', ''),
+                    "forgot": profiles[profile].get("config", {}).get('forgot', False),
+                    "search": profiles[profile].get("config", {}).get('search', False),
+                    "delete": profiles[profile].get("config", {}).get('delete', False),
+                    "skipmsg": profiles[profile].get("config", {}).get('skipmsg', False),
+                    "model": profiles[profile].get("config", {}).get('model', "gemini-2.0-flash"),
+                    "max_chat_size": profiles[profile].get("config", {}).get('max_chat_size', 15),
+                    "system_instruction": profiles[profile].get("config", {}).get('system_instruction', "")
                 },
                 "chat": list(profiles[profile].get("chat", []))
             }
