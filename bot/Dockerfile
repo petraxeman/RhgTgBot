@@ -1,7 +1,7 @@
 FROM python:3.12-slim
 
 RUN apt-get update --fix-missing && \
-    apt-get install supervisor git -y \
+    apt-get install git -y \
     && apt-get clean \
     && git config --global http.proxyAuthMethod 'basic'
 
@@ -13,4 +13,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-ENTRYPOINT supervisord -c /bot/supervisor.conf && python main.py
+ENTRYPOINT python main.py

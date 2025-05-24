@@ -1,38 +1,11 @@
-import persistent
-import persistent.list
-import persistent.mapping
 import logging
 import globals as g
 import os
 
-import ZODB
-from BTrees.IOBTree import IOBTree
-from BTrees.OOBTree import OOBTree
-
 log = logging.getLogger("rhgTGBot:dbsetup")
 
 system_instruction = ""
-actual_version = 1
 
-
-
-def initiate_database(db):
-    def set_if_not_exists(config, cfg, name):
-        config[name] = cfg.get(name, "") if not config.get(name) else config[name]
-        
-    with db.transaction() as conn:
-        if not hasattr(conn.root, "users"): conn.root.users = OOBTree()
-        if not hasattr(conn.root, "groups"): conn.root.groups = OOBTree()
-        if not hasattr(conn.root, "projects"): conn.root.projects = OOBTree()
-        if not hasattr(conn.root, "buckets"): conn.root.buckets = OOBTree()
-        if not hasattr(conn.root, "config") or g.cfg.get("SETUP", {}).get("reload_config", False):
-            prebuild_config = {}
-
-            set_if_not_exists(prebuild_config, g.cfg.get("SETUP", {}), "owner_username")
-            for prop in g.cfg.get("SETTINGS", {}).keys():
-                set_if_not_exists(prebuild_config, g.cfg.get("SETTINGS", {}), prop)
-            
-            conn.root.config = prebuild_config
 
 
 def initiate_derictories():
@@ -48,27 +21,33 @@ def initiate_derictories():
 async def initiate_admin(client):
     log.info("Настройка админа.")
     user_info = await client.get_users(g.owner_username)
-    # with g.db.transaction() as conn:
-    #     if not str(user_info.id) in conn.root.users or g.cfg.get("SETUP", {}).get("reload_config", False):
-    #         user = create_user(g.owner_username, user_info.id)
-    #         user["rights"] = ["all:full"]
-    #         conn.root.users[user_info.id] = user
-    log.info("Админ настроен.")
+    admin = await g.users.find_one({"tgid": user_info.id})
+    if not admin:
+        user_object = create_user(user_info.id, user_info.username)
+        user_object["rights"] = ["all:full"]
+        await g.users.insert_one(user_object)
+    
+    default_admin_profile = await g.profiles.find_one({"owner": user_info.id})
+    if not default_admin_profile:
+        await g.profiles.insert_one(create_profile(user_info.id))
 
 
-def validate_db():
-    with g.db.transaction() as conn:
-        for user in conn.root.users.keys():
-            pass
-
-
-def create_user(username: str, tgid: str) -> dict:
+def create_user(tgid: int, username: str) -> dict:
     return {
+        "type": "user",
+        "tgid": tgid,
         "username": username,
-        "tgid": str(tgid),
-        "rights": g.cfg["SETTINGS"]["default_rights"],
+        "rights": g.default_rights,
         "active_profile": "default",
-        "profiles": {"default": {
+        "profiles": ["default"]
+    }
+
+
+def create_profile(tgid: int) -> dict:
+    return {
+        "name": "default",
+        "owner": tgid,
+        "config": {
             "token": "",
             "forgot": False,
             "search": False,
@@ -76,50 +55,7 @@ def create_user(username: str, tgid: str) -> dict:
             "skipmsg": False,
             "model": "gemini-2.0-flash",
             "max_chat_size": 15,
-            "system_instruction": system_instruction
-            }}
-        }
-
-class User(persistent.Persistent):
-    def __init__(self, username, tgid):
-        self.tgid = tgid
-        self.rights = persistent.list.PersistentList()
-        self.active_profile = "default"
-        self.profiles = persistent.mapping.PersistentMapping({"default": PersonalBot()})
-
-
-class PersonalBot(persistent.Persistent):
-    def __init__(self):
-        self.version = 1
-        self.chat = []
-        self.config = persistent.mapping.PersistentMapping({
-            "token": None,
-            "forgot": False,
-            "search": False,
-            "delete": False,
-            "skipmsg": False,
-            "model": "gemini-2.0-flash",
-            "max_chat_size": 15,
-            "system_instruction": system_instruction
-            })
-
-
-# class TGGroup(persistent.Persistent):
-#     def __init__(self, tgid):
-#         self.tgid = tgid
-#         self.rules = persistent.mapping.PersistentMapping({
-#             "delete_timeout": -1
-#         })
-#         self.deletion_queue = persistent.list.PersistentList()
-
-
-# class Bucket(persistent.Persistent):
-#     def __init__(self, owner: int, name: str, is_dict: bool = False):
-#         self.owner = owner
-#         self.name  = name
-#         self.users = persistent.list.PersistentList()
-        
-#         if is_dict:
-#             self.data  = persistent.mapping.PersistentMapping()
-#         else:
-#             self.data  = persistent.list.PersistentList()
+            "system_instruction": system_instruction,
+        },
+        "chat": []
+    }

@@ -16,11 +16,11 @@ APP_SETTINGS = {
 
 async def app_args(client: Client, message: Message):
     text = "Сейчас установлены следующие настройки:\n"
-    with g.db.transaction() as conn:
-        config = conn.root.config
-        
-        for setting in APP_SETTINGS.keys():
-            text += f"{setting}: {config.get(setting)}\n"
+    
+    variables = await g.client.rhgtgbotdb.meta.find_one({"type": "global_variables"})
+    
+    for setting in APP_SETTINGS.keys():
+        text += f"{setting}: {variables.get(setting)}\n"
     
     log.info(f"Пользователь {message.from_user.username} ({message.from_user.id}) запросил информацию о настройках приложения.")
     
@@ -30,14 +30,17 @@ async def app_args(client: Client, message: Message):
 async def set_app_arg(client: Client, message: Message):
     if len(message.command) != 3:
         await message.reply_text("Неправильные аргументы.")
-
     arg, val = message.command[1], message.command[2]
-    if ( val not in APP_SETTINGS.get(arg, tuple()) ) and ( APP_SETTINGS.get(arg) != "string"):
+    
+    if arg not in APP_SETTINGS.keys():
         log.warning(f"Пользователь {message.from_user.username} ({message.from_user.id}) установил пыталсяя установить настройку прилажения {arg} на {val}. Это неверный аргумент.")
         await message.reply_text("Неправильные аргументы.")
     
-    with g.db.transaction() as conn:
-        conn.root.config[arg] = val
+    match arg:
+        case "default_rights":
+            await g.client.rhgtgbotdb.meta.update_one({"type": "global_variables"}, {"$set": {"default_rights": val.replace(" ", "").split(",")}})
+        case "hr_bot_name":
+            await g.client.rhgtgbotdb.meta.update_one({"type": "global_variables"}, {"$set": {"hr_bot_name": val}})
     
     log.info(f"Пользователь {message.from_user.username} ({message.from_user.id}) установил настройку прилажения {arg} на {val}")
     

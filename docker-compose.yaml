@@ -1,7 +1,7 @@
 version: "3.9"
 
 services:
-  app:
+  rhgtgbot_app:
     build:
       context: ./bot
       dockerfile: Dockerfile
@@ -12,6 +12,13 @@ services:
       API_HASH: 
 #      HTTP_PROXT: http://
 #      HTTPS_PROXY: http://
+      MONGO_DB_PORT: 
+      MONGO_DB_HOST: 
+      MONGO_DB_USER: 
+      MONGO_DB_PASS: 
+      TGBOT_HR_BOT_NAME: 
+      TGBOT_OWNER_USERNAME: 
+      TGBOT_DEFAULT_RIGHTS: 
     network_mode: "host"
 #    netowrk_mode: "container:name"
     volumes:
@@ -19,7 +26,7 @@ services:
       - ./bot_logs:/bot/logs
     restart: never
   
-    db:
+    rhgtgbot_mongodb:
     image: mongo
     container_name: mongodb
     environment:
@@ -27,8 +34,6 @@ services:
       MONGO_INITDB_ROOT_PASSWORD:
     volumes:
       - ./db_data:/data/db
-    ports:
-      - "27017:27017"
     deploy:
       resources:
         limits:

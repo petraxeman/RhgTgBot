@@ -1,33 +1,49 @@
-import os, toml, ZODB, logging, ZEO
+import os, toml, logging, asyncio
+from pymongo import AsyncMongoClient, MongoClient
+
+
 
 log = logging.getLogger("rhgTGBot:globals")
 
-tg_bot_name = None
-hr_bot_name = None
-owner_username = None
-default_rights = None
-register_mode = None
 
 
 log.info("Загрузка конфигурации")
 with open(os.path.join(".", "assets", "config.toml"), "r", encoding="utf8") as file:
     cfg = toml.loads(file.read())
-cfg["SETTINGS"]["default_rights"] = cfg.get("SETTINGS", {}).get("default_rights", "").replace(" ", "").split(",")
+cfg["SETTINGS"]["default_rights"] = cfg.get("SETTINGS", {}).get("default_rights", "")
+
+
+log.info("Загрузка переменных")
+sync_client = MongoClient(f'mongodb://{os.getenv("MONGO_DB_USER")}:{os.getenv("MONGO_DB_PASS")}@{os.getenv("MONGO_DB_HOST")}:{os.getenv("MONGO_DB_PORT")}')
+meta = sync_client.rhgtgbotdb.meta
+
+variables = meta.find_one({"type": "global_variables"})
+if not variables:
+    meta.insert_one({
+        "type": "global_variables",
+        "hr_bot_name": os.getenv("TGBOT_HR_BOT_NAME"),
+        "owner_username": os.getenv("TGBOT_OWNER_USERNAME"),
+        "default_rights": os.getenv("TGBOT_DEFAULT_RIGHTS").replace(" ", "").split(",")
+        })
+variables = meta.find_one({"type": "global_variables"})
+
+tg_bot_name = None
+hr_bot_name = variables.get("tg_bot_name")
+owner_username = variables.get("owner_username")
+default_rights = variables.get("default_rights")
+
+sync_client.close()
 
 
 log.info("Загрузка базы данных")
-client = ZEO.client(("127.0.0.1", 3000))
-db = ZODB.DB(client)
+client = AsyncMongoClient(f'mongodb://{os.getenv("MONGO_DB_USER")}:{os.getenv("MONGO_DB_PASS")}@{os.getenv("MONGO_DB_HOST")}:{os.getenv("MONGO_DB_PORT")}')
+#del os.environ["MONGO_DB_USER"]
+#del os.environ["MONGO_DB_PASS"]
+#del os.environ["MONGO_DB_HOST"]
+#del os.environ["MONGO_DB_PORT"]
+db = client.rhgtgbotdb
+users = db.users
+profiles = db.profiles
+groups = db.groups
 
-
-def init_const():
-    global owner_username, hr_bot_name, tg_bot_name, default_rights, register_mode
-    with db.transaction() as conn:
-        hr_bot_name = conn.root.config["hr_bot_name"]
-        owner_username = conn.root.config["owner_username"]
-        default_rights = conn.root.config["default_rights"]
-        register_mode = conn.root.config["register_mode"]
-    
-    log.info(f"Загруженные имена - Owner:'{owner_username}', hr_bt:'{hr_bot_name}'")
-    log.info(f"Загруженные права - '{default_rights}'")
-    log.info(f"Режим регистрации - '{register_mode}'")
+log.info("Загрузка закончена")

@@ -3,5 +3,6 @@ __pycache__/
 
 bot_assets/
 bot_logs/
+db_data/
 
 docker-compose-test.yaml

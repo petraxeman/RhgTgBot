@@ -37,72 +37,39 @@ GEMINI = 15
 
 
 async def pre_private_command(client: Client, message: Message):
-    message.from_user.id = str(message.from_user.id)
+    user = await g.users.find_one({"tgid": message.from_user.id})
     
-    with g.db.transaction() as conn:
-        try:
-            user = conn.root.users[message.from_user.id]
-        except KeyError:
-            user = None
-        
-        result = await utils.access.process(message.matches[0].group("command"), user["rights"] if user else [], message, log)
-
-        message.sender_rights = list(user["rights"])
+    result = await utils.access.process(message.matches[0].group("command"), user["rights"] if user else [], message, log)
     
     if not result:
         message.stop_propagation()
+    
+    message.sender = user
 
 
 async def gemini_ask(client: Client, message: Message):
     if not message.text or message.text[0] in ["/", "!"]:
         return
-    message.from_user.id = str(message.from_user.id)
-    userid = message.from_user.id
+    
     task = asyncio.create_task(utils.send_typing(message))
+    message.sender = await g.users.find_one({"tgid": message.from_user.id})
+    message.profile = await g.profiles.find_one({"owner": message.sender["tgid"], "name": message.sender["active_profile"]})
+    
     try:
-        with g.db.transaction() as conn:
-            user_rights = list(conn.root.users[userid]["rights"])
-            profile_name = conn.root.users[userid]["active_profile"]
-            token = conn.root.users[userid]["profiles"].get(profile_name, {}).get("config", {}).get("token", "")
-        
-        if not token or len(token) < 20:
-            return
-        
-        if message.chat.type == ChatType.PRIVATE:
-            result = await utils.access.process("ask", user_rights, message, log)
-            if not result:
-                return
-            await handlers.gemini.talking.private_ask(client, message)
-            
-        elif message.chat.type in [ChatType.GROUP, ChatType.SUPERGROUP]:
-            result = await utils.access.process("private_ask", user_rights, message, log)
-            if not result:
-                return
-            await handlers.gemini.talking.ask(client, message)
+        if message.sender or message.profile:
+            if message.profile.get("config", {}).get("token"):
+                if message.chat.type == ChatType.PRIVATE:
+                    result = await utils.access.process("ask", message.sender["rights"], message, log)
+                    if result:
+                        await handlers.gemini.talking.private_ask(client, message)
+                    
+                elif message.chat.type in [ChatType.GROUP, ChatType.SUPERGROUP]:
+                    result = await utils.access.process("private_ask", message.sender["rights"], message, log)
+                    if result:
+                        await handlers.gemini.talking.ask(client, message)
     finally:
         task.cancel()
         await bot.send_chat_action(message.chat.id, ChatAction.CANCEL)
-   
-
-async def transfer(client: Client, message: Message):
-    if message.from_user.username == g.owner_username:
-        try:
-            new_owner_username = message.command[1]
-        except:
-            return
-
-        with g.db.transaction() as conn:
-            conn.root.config["owner_username"] = new_owner_username
-        
-        g.init_const()
-        
-        try:
-            await client.send_message(new_owner_username, "Теперь вы мой владелец.")
-            await message.reply_text("Вы больше не владелец.")
-        except:
-            await message.reply_text("Кажется мой владелец еще не существует.")
-        
-        log.info(f"Трансфер успешно проведен. Бывший админ {message.from_user.username}. Новый админ {new_owner_username}")
 
 
 async def main():
@@ -110,7 +77,6 @@ async def main():
     
     log.info("Бот запущен.")
     
-    bot.add_handler(MessageHandler(transfer, filters.command("transfer") & filters.private), group = PRELUDE)
     bot.add_handler(MessageHandler(pre_private_command, filters.private & filters.regex(r"^\/(?P<command>[a-zA-Z]\S*)")), group = PRELUDE)
     handlers.admin.include(bot, ADM)
     handlers.info.include(bot, INFO)
@@ -136,8 +102,6 @@ if __name__ == "__main__":
     log.info("Инициализация базы данных")
     
     utils.db.initiate_derictories()
-    utils.db.initiate_database(g.db)
-    g.init_const()
     
     bot = utils.bot.setup_bot()
     

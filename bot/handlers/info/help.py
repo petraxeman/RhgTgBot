@@ -51,14 +51,8 @@ ai_help_message = "Информация о командах секции ai:\n" 
 
 async def help_command(client: Client, message: Message):
     log.info(f"Пользователь {message.from_user.username} ({message.from_user.id}) вызвал помощь")
-    if len(message.command) > 1:
-        match message.command[1]:
-            case "gemini":
-                await message.reply_text(ai_help_message)
-            case _:
-                pass
-    else:
-        if g.register_mode == "manual":
-            await message.reply_text(default_help_message)
-        elif g.register_mode == "auto":
-            await message.reply_text(default_help_message + "\n" + register_help_message)
+    match message.command[1]:
+        case "gemini":
+            await message.reply_text(ai_help_message)
+        case _:
+            pass

@@ -36,7 +36,7 @@ def split_text(original_text: str, max_size = 4096):
             current_text += " " + word
         else:
             texts.append(current_text)
-            current_text = ""
+            current_text = word
 
     if current_text:
         texts.append(current_text)
@@ -50,4 +50,4 @@ async def send_typing(message: Message):
         await asyncio.sleep(5)
 
 
-from . import bot, db, access, ai, message, tempdirs
+from . import bot, db, access, message, tempdirs
