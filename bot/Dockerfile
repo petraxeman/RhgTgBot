@@ -1,4 +1,5 @@
 FROM python:3.12-slim
+# python:3.12-slim
 
 RUN apt-get update --fix-missing && \
     apt-get install git -y \

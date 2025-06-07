@@ -2,7 +2,6 @@ import os, logging
 from pyrogram import Client
 from pyrogram.types import Message
 import globals as g
-from . import db
 
 log = logging.getLogger("rhgTGBot:utils:bot")
 
@@ -15,6 +14,10 @@ def setup_bot():
         api_hash = os.getenv("API_HASH"),
         bot_token = os.getenv("BOT_TOKEN"),
         workdir = os.path.join(".", "assets", "sessions"))
+    
+    #g.API_ID = os.environ["API_ID"]
+    #g.API_HASH = os.environ["API_HASH"]
+    g.BOT_TOKEN = os.environ.get("BOT_TOKEN")
     
     del os.environ["API_ID"]
     del os.environ["API_HASH"]

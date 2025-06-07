@@ -1,9 +1,6 @@
 import logging
-import persistent
-import persistent.list
 from pyrogram import Client
 from pyrogram.types import Message
-import utils
 
 import globals as g
 

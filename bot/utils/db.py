@@ -39,6 +39,7 @@ def create_user(tgid: int, username: str) -> dict:
         "username": username,
         "rights": g.default_rights,
         "active_profile": "default",
+        "available_commands": {},
         "profiles": ["default"]
     }
 
@@ -59,3 +60,40 @@ def create_profile(tgid: int) -> dict:
         },
         "chat": []
     }
+
+
+def create_plugin(owner: int,
+                   name: str,
+                   codename: str,
+                   url: str,
+                   access: str = "private"):
+    return {
+        "owner": owner,
+        "name": name,
+        "codename": codename,
+        "url": url,
+        "access": access,
+        "followers": [],
+        "buckets": [],
+        "commands": []
+    }
+    
+
+def create_bucket(plugin_codename: str,
+                  bucket_codename: str,
+                  bucket_type: str,
+                  bucket_access: str,
+                  encrypt: bool = False):
+    bucket = {
+        "plugin": plugin_codename,
+        "codename": bucket_codename,
+        "type": bucket_type,
+        "access": bucket_access,
+        "encrypt": encrypt
+    }
+    if bucket_type == "list":
+        bucket["items"] = []
+    elif bucket_type == "dict":
+        bucket["items"] = {}
+    
+    return bucket

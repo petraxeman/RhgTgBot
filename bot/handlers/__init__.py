@@ -1,1 +1,2 @@
-from . import admin, gemini, info, project
+from . import admin, gemini, info, plugins
+

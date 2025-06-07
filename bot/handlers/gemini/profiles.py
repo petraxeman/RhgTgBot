@@ -1,7 +1,6 @@
-import logging, copy, re
+import logging
 from pyrogram import Client
 from pyrogram.types import Message
-import utils
 import globals as g
 
 log = logging.getLogger("rhgTGBot:gemini:profiles")
