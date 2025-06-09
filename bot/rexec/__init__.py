@@ -6,7 +6,8 @@ from pymongo import MongoClient
 from origamibot import OrigamiBot as Bot
 
 #from . import luaUsersLib, luaBucketsLib 
-from . import rhgTelegramLib
+from . import rpTelegramLib, rpBucketsLib
+
 from pyrogram.types import Message
 
 import logging
@@ -14,17 +15,20 @@ log = logging.getLogger("rhgTGBot:worker_manager")
 
 
 class Importer:
-    def __init__(self, message: dict, plugin: str, module: str, method: str, tg_client):
-        self.__message = message
-        self.__plugin = plugin
-        self.__module = module
-        self.__method = method
-        self.__client = tg_client
+    def __init__(self, message: dict, plugin: str, module: str, method: str, tg_client, db):
+        self._message = message
+        self._plugin = plugin
+        self._module = module
+        self._method = method
+        self._client = tg_client
+        self._db = db
     
     def __call__(self, m: str):
         match m:
-            case "py:Telegram":
-                return rhgTelegramLib.TelegramLib(self.__client, self.__message)
+            case "rp:Telegram":
+                return rpTelegramLib.TelegramLib(self._client, self._message)
+            case "rp:Buckets":
+                return rpBucketsLib.BucketsLib(self._db, self._plugin, self._message.get("user_id"))
 
 
 class WorkerManager:
@@ -103,7 +107,7 @@ def command_executor(task: dict, db: MongoClient, tg_client: Bot):
         return
     
     lua = lupa.LuaRuntime()
-    lua.globals()["import"] = Importer(message, plugin, module, method, tg_client)
+    lua.globals()["import"] = Importer(message, plugin, module, method, tg_client, db.rhgtgbotdb)
     lua.execute(loaded_code["code"])
     lua.globals()[method](*command[1:])
 
