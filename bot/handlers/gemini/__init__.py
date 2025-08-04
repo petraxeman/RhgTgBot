@@ -36,12 +36,12 @@ async def gemini_ask(client: Client, message: Message):
         if message.sender or message.profile:
             if message.profile.get("config", {}).get("token"):
                 if message.chat.type == ChatType.PRIVATE:
-                    result = await utils.access.process("ask", message.sender["rights"], message, log)
+                    result = await utils.access.process("ask", message.sender["rights"], message)
                     if result:
                         await talking.private_ask(client, message)
                     
                 elif message.chat.type in [ChatType.GROUP, ChatType.SUPERGROUP]:
-                    result = await utils.access.process("private_ask", message.sender["rights"], message, log)
+                    result = await utils.access.process("private_ask", message.sender["rights"], message)
                     if result:
                         await talking.ask(client, message)
     finally:

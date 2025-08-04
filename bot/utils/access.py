@@ -1,5 +1,7 @@
-import os
+import logging
 import globals as g
+
+log = logging.getLogger("rhgTGBot:utils:access")
 
 access_rights = {
     # Administration category
@@ -41,7 +43,7 @@ def verify(method: str, user_rights: list) -> bool:
         return False
 
 
-async def process(method, user_rights, message, log):
+async def process(method, user_rights, message):
     if not verify(method, user_rights) and message.from_user.username != g.owner_username:
         log.warning(f"Пользователь {message.from_user.username} ({message.from_user.id}) пытался вызвать метод /{method} без прав.")
         return False

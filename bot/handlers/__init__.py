@@ -1,2 +1,1 @@
-from . import admin, gemini, info, plugins
-
+from . import admin, gemini, info, plugins, prelude

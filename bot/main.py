@@ -36,59 +36,12 @@ GEMINI = 15
 
 
 
-async def pre_all(client: Client, message: Message):
-    message.stop_propagation()
-
-
-async def pre_private_command(client: Client, message: Message):
-    user = await g.users.find_one({"tgid": message.from_user.id})
-    if not user:
-        return
-    
-    result = await utils.access.process(message.matches[0].group("command"), user["rights"] if user else [], message, log)
-    if not result:
-        message.stop_propagation()
-
-    message.sender = user
-
-
-async def pre_custom_command(client: Client, message: Message):
-    if not message.text.startswith("!"):
-        return
-    
-    user = await g.users.find_one({"tgid": message.from_user.id})
-    if not user:
-        return
-    
-    command = utils.parser.parse_command(message.text)
-    plugin_codename = None
-    for p in user["commands"]:
-        if command[0] in user["commands"][p]:
-            plugin_codename = p
-            break
-    if not plugin_codename:
-        return
-    
-    method = None
-    plugin = await g.plugins.find_one({"codename": plugin_codename})
-    for c in plugin["commands"]:
-        if c["command"] == command[0]:
-            method = c["method"]
-            break
-    
-    await rexec.gWorkerManager.execute_command(utils.parser.dump_message(message), plugin, method, command)
-    
-    message.stop_propagation()
-    
-
 async def main():
     await bot.start()
     
     log.info("Бот запущен.")
     
-    bot.add_handler(MessageHandler(pre_all, filters.outgoing), group = PRELUDE)
-    bot.add_handler(MessageHandler(pre_private_command, filters.private & filters.regex(r"^\/(?P<command>[a-zA-Z]\S*)")), group = PRELUDE)
-    bot.add_handler(MessageHandler(pre_custom_command, filters.text & filters.private), group = PRELUDE)
+    handlers.prelude.include(bot, PRELUDE)
     handlers.admin.include(bot, ADM)
     handlers.info.include(bot, INFO)
     handlers.plugins.include(bot, PLUGIN)
@@ -112,6 +65,7 @@ async def main():
         log.info("Получен сигнал KeyboardInterrupt. Завершение...")
         await bot.stop()
         quit()
+
 
 
 if __name__ == "__main__":
