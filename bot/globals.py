@@ -5,6 +5,35 @@ from pymongo import AsyncMongoClient, MongoClient
 log = logging.getLogger("rhgTGBot:globals")
 
 
+_possible_gmn_models = {
+    "gemma-3n-e2b-it": ["gemma-3n-e2b-it", "gemma-3n", "gemma"],
+    "gemma-3n-e4b-it": ["gemma-3n-e4b-it"],
+    "gemma-3-1b-it": ["gemma-3-1b-it"],
+    "gemma-3-4b-it": ["gemma-3-4b-it"],
+    "gemma-3-12b-it": ["gemma-3-12b-it"],
+    "gemma-3-27b-it": ["gemma-3-27b-it", "gemma-3"],
+    "gemini-2.0-flash": ["gemini-2.0-flash", "gemini-2.0", "gemini-2"],
+    "gemini-2.0-flash-lite": ["gemini-2.0-flash-lite"],
+    "gemini-2.5-pro": ["gemini-2.5-pro"],
+    "gemini-2.5-flash": ["gemini-2.5-flash", "gemini-2.5", "gemini"],
+    "gemini-2.5-flash-lite": ["gemini-2.5-flash-lite"]
+}
+
+POSSIBLE_GMN_MODELS = dict([(v, k) for k, v_list in _possible_gmn_models.items() for v in v_list])
+
+GEMINI_ARGS = {
+    "token": {"type": "string", "hide": True},
+    "forgot": {"type": "bool"},
+    "search": {"type": "bool"},
+    "delete": {"type": "bool"},
+    "skipmsg": {"type": "bool"},
+    "model": {"type": "string", "variants": set(POSSIBLE_GMN_MODELS.keys()), "legend": POSSIBLE_GMN_MODELS},
+    "max_chat_size": {"type": "int"},
+    "system_instruction": {"type": "string", "long": True}   
+}
+
+del _possible_gmn_models
+
 
 log.info("Загрузка переменных...")
 db_credentials = f'mongodb://{os.getenv("MONGO_DB_USER")}:{os.getenv("MONGO_DB_PASS")}@{os.getenv("MONGO_DB_HOST")}:{os.getenv("MONGO_DB_PORT")}'
