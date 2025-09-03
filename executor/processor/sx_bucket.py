@@ -2,7 +2,7 @@ from typing import Any
 import globals as g
 
 
-class BucketsLib:
+class Library:
     def __init__(self, db, plugin:str, sender: dict):
         self._sender = sender
         self._plugin = plugin

@@ -22,10 +22,9 @@ import asyncio, pyrogram, traceback
 import globals as g
 
 from pyrogram.handlers import MessageHandler
-from pyrogram import Client, filters
-from pyrogram.types import Message
+from pyrogram import filters
 
-import utils, handlers, rexec
+import utils, handlers
 
 PRELUDE = -1
 ADM = 0
@@ -44,7 +43,7 @@ async def main():
     handlers.prelude.include(bot, PRELUDE)
     handlers.admin.include(bot, ADM)
     handlers.info.include(bot, INFO)
-    handlers.plugins.include(bot, PLUGIN)
+    # handlers.plugins.include(bot, PLUGIN)
     handlers.gemini.include(bot, GEMINI)
     bot.add_handler(MessageHandler(handlers.gemini.gemini_ask, filters.mentioned | filters.private), group = GEMINI)
     

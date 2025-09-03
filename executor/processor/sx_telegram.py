@@ -3,7 +3,7 @@ from pyrogram import Client
 
 
 
-class TelegramLib:
+class Library:
     def __init__(self, client: Client, message: dict):
         self._client = client
         self._message = message
