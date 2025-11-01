@@ -1,18 +1,19 @@
 import logging
-import globals as g
 import os
+
+import globals as g
+
 
 log = logging.getLogger("rhgTGBot:dbsetup")
 
 system_instruction = ""
 
 
-
 def initiate_derictories():
     for directory in ["assets", "logs"]:
         if not os.path.exists(os.path.join(".", directory)):
             os.makedirs(os.path.join(".", directory))
-    
+
     for directory in ["db", "sessions", "temp", "projects"]:
         if not os.path.exists(os.path.join(".", "assets", directory)):
             os.makedirs(os.path.join(".", "assets", directory))
@@ -26,7 +27,7 @@ async def initiate_admin(client):
         user_object = create_user(user_info.id, user_info.username)
         user_object["rights"] = ["all:full"]
         await g.users.insert_one(user_object)
-    
+
     default_admin_profile = await g.profiles.find_one({"owner": user_info.id})
     if not default_admin_profile:
         await g.profiles.insert_one(create_profile(user_info.id))
@@ -63,10 +64,10 @@ def create_profile(tgid: int) -> dict:
 
 
 def create_plugin(owner: int,
-                   name: str,
-                   codename: str,
-                   url: str,
-                   access: str = "private"):
+                  name: str,
+                  codename: str,
+                  url: str,
+                  access: str = "private"):
     return {
         "owner": owner,
         "name": name,
@@ -77,7 +78,7 @@ def create_plugin(owner: int,
         "buckets": [],
         "commands": []
     }
-    
+
 
 def create_bucket(plugin_codename: str,
                   bucket_codename: str,
@@ -95,5 +96,5 @@ def create_bucket(plugin_codename: str,
         bucket["items"] = []
     elif bucket_type == "dict":
         bucket["items"] = {}
-    
+
     return bucket

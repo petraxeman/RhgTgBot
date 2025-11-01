@@ -1,6 +1,12 @@
-import os, logging
+import logging
+import os
+
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from pymongo import AsyncMongoClient, MongoClient
+from pymongo import (
+    AsyncMongoClient,
+    MongoClient
+)
+
 
 log = logging.getLogger("rhgTGBot:globals")
 
@@ -29,7 +35,7 @@ GEMINI_ARGS = {
     "skipmsg": {"type": "bool"},
     "model": {"type": "string", "variants": set(POSSIBLE_GMN_MODELS.keys()), "legend": POSSIBLE_GMN_MODELS},
     "max_chat_size": {"type": "int"},
-    "system_instruction": {"type": "string", "long": True}   
+    "system_instruction": {"type": "string", "long": True}
 }
 
 del _possible_gmn_models
@@ -52,7 +58,7 @@ if not variables:
         "hr_bot_name": os.getenv("TGBOT_HR_BOT_NAME"),
         "owner_username": os.getenv("TGBOT_OWNER_USERNAME"),
         "default_rights": os.getenv("TGBOT_DEFAULT_RIGHTS").replace(" ", "").split(",")
-        })
+    })
 variables = meta.find_one({"type": "global_variables"})
 
 tg_bot_name = None

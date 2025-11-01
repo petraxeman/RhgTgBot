@@ -1,9 +1,10 @@
-import os, shutil
+import os
 import random as rnd
+import shutil
 from contextlib import contextmanager
 
-alphabet = list("QAZWSXEDCRFVTGBYHNUJMIKOLPqazwsxedcrfvtgbyhnujmikop1234567890")
 
+alphabet = list("QAZWSXEDCRFVTGBYHNUJMIKOLPqazwsxedcrfvtgbyhnujmikop1234567890")
 
 
 @contextmanager
@@ -19,6 +20,6 @@ def context_temp_dir():
 def gen_name() -> str:
     "Generate random string [A-Za-z0-9]{10}"
     name = ""
-    for i in range(0, rnd.randint(10,15)):
+    for i in range(0, rnd.randint(10, 15)):
         name += rnd.choice(alphabet)
     return name

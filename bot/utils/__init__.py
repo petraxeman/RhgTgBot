@@ -1,11 +1,20 @@
+from . import (
+    access,
+    bot,
+    db,
+    message,
+    parser,
+    temp
+)
 import asyncio
+
 from pyrogram import Client
-from pyrogram.types import Message
 from pyrogram.enums import ChatAction
+from pyrogram.types import Message
+
 
 true = ["t", "true", "yes", "y", "1", "д", "да", "-"]
 false = ["f", "false", "no", "n", "0", "н", "нет", "+"]
-
 
 
 def cast_to_bool(var: str) -> bool:
@@ -30,7 +39,7 @@ def xor(f: bool, s: bool):
 def split_text(original_text: str, max_size = 4096):
     texts = []
     current_text = ""
-    
+
     for word in original_text.split(" "):
         if len(current_text + " " + word) < max_size:
             current_text += " " + word
@@ -40,7 +49,7 @@ def split_text(original_text: str, max_size = 4096):
 
     if current_text:
         texts.append(current_text)
-    
+
     return texts
 
 
@@ -48,6 +57,3 @@ async def send_typing(message: Message):
     while True:
         await message.reply_chat_action(ChatAction.TYPING)
         await asyncio.sleep(5)
-
-
-from . import bot, db, access, message, parser, temp

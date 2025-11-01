@@ -1,10 +1,11 @@
-from pyrogram.handlers import MessageHandler
 from pyrogram import filters
+from pyrogram.handlers import MessageHandler
 
-from . import users
-from . import app
-from . import rights
-
+from . import (
+    app,
+    rights,
+    users
+)
 
 
 def include(bot, group: int):
