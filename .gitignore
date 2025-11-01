@@ -165,7 +165,8 @@ __marimo__/
 bot_assets/
 bot_logs/
 db_data/
+test_env/
 
-docker-compose-test.yaml
+docker-compose-test*
 
 exper*
