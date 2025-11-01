@@ -1,0 +1,28 @@
+# виртуальные окружения
+.venv
+venv/
+
+# кеши и артефакты
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# git
+.git
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# логи
+*.log
+
+# docker stuff
+docker-compose.yml
+Dockerfile
