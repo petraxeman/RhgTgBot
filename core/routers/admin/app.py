@@ -12,7 +12,6 @@ from schemas.admin import (
     GetAppArgsResponse,
     SetAppArgsRequest
 )
-from utils.db import create_user
 
 
 router = APIRouter()

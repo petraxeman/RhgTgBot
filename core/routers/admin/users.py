@@ -32,13 +32,13 @@ async def add_user(request: AddUserRequest, db: AsyncDatabase = Depends(get_asyn
     return {"uuid": user["uuid"]["internal"]}
 
 
+# TODO Убрать возможность удалить самого себя
 @router.post("/del-user", status_code=status.HTTP_200_OK)
 async def del_user(request: DeleteUserRequest, db: AsyncDatabase = Depends(get_async_db), initiator: dict = Depends(verify_user("del_user"))):
     user: dict | None = await db.users.find_one({f"uuid.{request.target[0]}": request.target[1]})
     if not user:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "This user don't exists.")
     await db.users.delete_one({f"uuid.{request.target[0]}": request.target[1]})
-    return {}
 
 
 @router.post("/get-user", response_model=UserObjectResponse, status_code=status.HTTP_200_OK)
@@ -47,10 +47,11 @@ async def get_user(request: GetUserRequest, db: AsyncDatabase = Depends(get_asyn
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found.")
     del user["_id"]
-    return user
+    return {"user": user}
 
 
 @router.post("/get-users-list", response_model=UsersListResponse, status_code=status.HTTP_200_OK)
 async def get_users_list(request: GetUsersListRequest, db: AsyncDatabase = Depends(get_async_db), initiator: dict = Depends(verify_user("get_users_list"))):
     users: list[dict] = list(await db.users.find({}).sort([("_id", 1)]).skip((request.page - 1) * request.page_size).limit(request.page_size).to_list())
+    print(users)
     return {"users": [user["uuid"]["internal"] for user in users]}

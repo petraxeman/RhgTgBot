@@ -28,6 +28,8 @@ async def add_rights(request: AddRightsRequest, db: AsyncDatabase = Depends(get_
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Somthing went wrong.")
 
 
+# TODO Убрать возможность у имеющих права all:full удалять у себя права all:full
+# TODO Метод будет успешен даже если у пользователя таких прав не было, это неправильно. Добавить ошибку
 @router.post("/del-rights", status_code=status.HTTP_200_OK)
 async def del_rights(request: DelRightsRequest, db: AsyncDatabase = Depends(get_async_db), initiator: dict = Depends(verify_user("del_rights"))):
     try:
@@ -42,9 +44,9 @@ async def get_rights(request: GetRightsRequest, db: AsyncDatabase = Depends(get_
     user = await db.users.find_one({"uuid": {request.target[0]: request.target[1]}})
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-    return {"rights": user["rights"], "user": user["uuid"]}
+    return {"rights": user["rights"], "user": ["internal", user["uuid"]["internal"]]}
 
 
 @router.post("/get-self-rights", response_model=GetRightsResponse, status_code=status.HTTP_200_OK)
 async def get_self_rights(request: GetSelfRightsRequest, db: AsyncDatabase = Depends(get_async_db), initiator: dict = Depends(verify_user("get_self_rights"))):
-    return {"rights": initiator["rights"], "user": initiator["uuid"]}
+    return {"rights": initiator["rights"], "user": ["internal", initiator["uuid"]["internal"]]}

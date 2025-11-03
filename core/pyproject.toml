@@ -1,0 +1,7 @@
+[tool.pytest_env]
+BF_ACCESS_KEY = "test_secret"
+BF_ADMIN_USERNAME = "admin"
+BF_MONGODB_URI = "mongodb://user:password@localhost:27017"
+BF_MONGODB_DB = "bobbyforge-test"
+BF_DEBUG = true
+BF_DEFAULT_RIGHTS = "gmn:full,"

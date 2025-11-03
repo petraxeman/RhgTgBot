@@ -8,13 +8,13 @@ from pydantic import (
 
 class AddUserRequest(BaseModel):
     initiator: list[str] = Field(min_length=2, max_length=2)  # uuid_provider, UUID of initiator user
-    target: list[str] = Field(min_length=2, max_length=2)  # uuid_provider, UUID of initiator user
+    target: list[str] = Field(min_length=2, max_length=2)  # uuid_provider, UUID of target user
     username: str = Field()  # username of target user
 
 
 class DeleteUserRequest(BaseModel):
     initiator: list[str] = Field(min_length=2, max_length=2)  # uuid_provider, UUID of initiator user
-    target: list[str] = Field(min_length=2, max_length=2)  # uuid_provider, UUID of initiator user
+    target: list[str] = Field(min_length=2, max_length=2)  # uuid_provider, UUID of target user
 
 
 class GetUsersListRequest(BaseModel):
@@ -24,7 +24,8 @@ class GetUsersListRequest(BaseModel):
 
 
 class GetUserRequest(BaseModel):
-    target: list[str] = Field(min_length=2, max_length=2)  # uuid_provider, UUID of initiator user
+    initiator: list[str] = Field(min_length=2, max_length=2)  # uuid_provider, UUID of initiator user
+    target: list[str] = Field(min_length=2, max_length=2)  # uuid_provider, UUID of target user
 
 
 class UserUUIDResponse(BaseModel):
@@ -36,12 +37,7 @@ class UsersListResponse(BaseModel):
 
 
 class UserObjectResponse(BaseModel):
-    username: str = Field()
-    uuid: dict[str, str] = Field()
-    rights: list[str] = Field()
-    active_profile: str = Field()
-    profiles: list[str] = Field()
-    is_banned: bool = Field()
+    user: dict = Field()
 
 
 # Rights category
