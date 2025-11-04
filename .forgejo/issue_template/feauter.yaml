@@ -1,10 +1,10 @@
 ---
-name: Bug template
-about: This template for bugs
-title: "[BUG] "
+name: Feauter template
+about: This template for feauters
+title: "[FEAUTER] "
 ref: main
 labels:
-  - Баг
+  - Желаемая функция
   - Сбор информации
 body:
   - type: input
