@@ -1,0 +1,32 @@
+---
+name: Bug template
+about: This template for bugs
+title: "[BUG] "
+ref: main
+labels:
+  - Баг
+  - Сбор информации
+body:
+  - type: input
+    id: motivation
+    attributes:
+      label: '**Мотивация:**'
+      description: Чем конкретно эта функция может помочь
+      placeholder: Это может улучшить ...
+  - type: textarea
+    id: current-situation
+    attributes:
+      label: '**Как это работает сейчас:**'
+      description: Что конкретно сейчас неправильно
+      placeholder: |
+        Следующие пункты работают неправильно:
+        "-  "
+  - type: textarea
+    id: expected-outcome
+    attributes:
+      label: '**Как должно быть:**'
+      description: Какие конкретные пункты и как должны работать
+      placeholder: |
+        Нужно соответсвие следующим пунктам:
+        - [ ]
+---
